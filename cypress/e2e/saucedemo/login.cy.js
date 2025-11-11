@@ -1,5 +1,5 @@
 describe('Login on SauceDemo', () => {
-    const resultsFile = 'cypress/results/login-test.json'
+    const resultsFile = 'cypress/results/saucedemo-login.json'
     let startTime, endTime
 
     it('should login and validate', () => {
