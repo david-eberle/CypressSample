@@ -1,31 +1,17 @@
-const fs = require('fs')
-const path = require('path')
-
 describe('Login on SauceDemo', () => {
-    const resultsFile = path.join('cypress', 'results', 'login-test.json')
-    let startTime
-    let endTime
+    const resultsFile = 'cypress/results/login-test.json'
+    let startTime, endTime
 
-    it('should login with standard_user and validate login', () => {
+    it('should login and validate', () => {
         startTime = new Date()
-
-        cy.visit('/')
+        cy.visit('https://www.saucedemo.com/')
         cy.login('standard_user', 'secret_sauce')
-
         cy.url().should('include', '/inventory.html')
         cy.get('.inventory_list').should('be.visible')
-
-        cy.then(() => {
-            endTime = new Date()
-        })
+        cy.then(() => { endTime = new Date() })
     })
 
-    it('should save test timestamps to JSON', () => {
-        if (!startTime || !endTime) {
-            cy.log('Timestamps not available')
-            return
-        }
-
+    it('should save timestamps to JSON', () => {
         const durationMs = endTime - startTime
         const result = {
             testName: 'Login on SauceDemo',
@@ -34,7 +20,9 @@ describe('Login on SauceDemo', () => {
             durationMs
         }
 
-        fs.mkdirSync(path.dirname(resultsFile), { recursive: true })
-        fs.writeFileSync(resultsFile, JSON.stringify(result, null, 2))
+        cy.task('writeFile', {
+            filePath: resultsFile,
+            content: JSON.stringify(result, null, 2)
+        })
     })
 })
