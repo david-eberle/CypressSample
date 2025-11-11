@@ -3,8 +3,8 @@ name: Cypress E2E Tests
 on:
   push:
     branches: [main]
-  pull_request:
-
+  workflow_dispatch:
+  
 jobs:
   saucedemo_login:
     name: Saucedemo Login Test
