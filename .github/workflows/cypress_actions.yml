@@ -26,7 +26,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: saucedemo-json
-          path: cypress/results/saucedemo.json
+          path: cypress/results/saucedemo-login.json
 
   expandtesting_login:
     name: ExpandTesting Login Test
@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: expandtesting-json
-          path: cypress/results/expandtesting.json
+          path: cypress/results/expandtesting-login.json
 
   notify_testhub:
     name: Post results to TestHub
