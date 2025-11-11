@@ -18,13 +18,19 @@ describe('Login on ExpandTesting', () => {
         cy.then(() => { endTime = new Date() })
     })
 
-    it('should save timestamps to JSON', () => {
+    it('should save timestamps to JSON', function () {
         const durationMs = endTime - startTime
+
+        const allPassed = this.test.parent.tests
+            .filter(t => t.title !== this.test.title) // excluir este it
+            .every(t => t.state === 'passed')
+
         const result = {
             testName: 'Login on ExpandTesting',
             startTime: startTime.toISOString(),
             endTime: endTime.toISOString(),
-            durationMs
+            durationMs,
+            passed: allPassed
         }
 
         cy.task('writeFile', {

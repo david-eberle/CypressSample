@@ -6,73 +6,91 @@ on:
   pull_request:
 
 jobs:
-  e2e-tests:
+  saucedemo_login:
+    name: Saucedemo Login Test
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Run Cypress tests in Docker
+      - name: Run Cypress saucedemo tests
         run: |
+          mkdir -p cypress/results
           docker run --rm \
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/saucedemo/**/*.cy.js" || true
+            npx cypress run --spec "cypress/e2e/saucedemo/**/*.cy.js" --reporter json --reporter-options output=cypress/results/saucedemo.json || true
 
+      - name: Upload saucedemo result
+        uses: actions/upload-artifact@v4
+        with:
+          name: saucedemo-json
+          path: cypress/results/saucedemo.json
+
+  expandtesting_login:
+    name: ExpandTesting Login Test
+    runs-on: ubuntu-latest
+    needs: [saucedemo_login]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress expandtesting tests
+        run: |
+          mkdir -p cypress/results
           docker run --rm \
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/expandtesting/**/*.cy.js" || true
+            npx cypress run --spec "cypress/e2e/expandtesting/**/*.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting.json || true
 
-      - name: Post results to TestHub
-        env:
-          JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          JOB_STATUS: ${{ job.status }}
+      - name: Upload expandtesting result
+        uses: actions/upload-artifact@v4
+        with:
+          name: expandtesting-json
+          path: cypress/results/expandtesting.json
+
+  notify_testhub:
+    name: Post results to TestHub
+    runs-on: ubuntu-latest
+    needs: [saucedemo_login, expandtesting_login]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./cypress/results
+
+      - name: Build payload and post
         run: |
-          # read JSONs
-          SAUCE_JSON="cypress/results/login-test.json"
-          EXPAND_JSON="cypress/results/expandtesting-login.json"
+          JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          RESULTS_JSON="[]"
 
-          SAUCE_DURATION=$(jq -r '.durationMs' $SAUCE_JSON)
-          EXPAND_DURATION=$(jq -r '.durationMs' $EXPAND_JSON)
+          for file in cypress/results/*.json; do
+            TEST_NAME=$(jq -r '.testName' $file)
+            DURATION=$(jq -r '.durationMs' $file)
+            PASSED=$(jq -r '.stats.failures == 0' $file)
+            
+            RESULTS_JSON=$(echo $RESULTS_JSON | jq --arg name "$TEST_NAME" --argjson duration "$DURATION" --argjson passed "$PASSED" '. + [{name: $name, passed: $passed, duration: $duration, logUrl: "'"$JOB_URL"'"}]')
+          done
 
-          # determine pass/fail
-          if [ "$JOB_STATUS" == "success" ]; then
-            SAUCE_PASS=true
-            EXPAND_PASS=true
-          else
-            SAUCE_PASS=false
-            EXPAND_PASS=false
-          fi
-
-          # create payload
           PAYLOAD=$(jq -n \
             --arg projectName "Cypress Tests" \
             --arg source "GitHub Actions" \
             --arg triggeredBy "qat-ci-bot" \
-            --arg logUrl "$JOB_URL" \
-            --argjson sauceduration "$SAUCE_DURATION" \
-            --argjson expandduration "$EXPAND_DURATION" \
-            --argjson saucepassed "$SAUCE_PASS" \
-            --argjson expandpassed "$EXPAND_PASS" \
+            --argjson results "$RESULTS_JSON" \
             '{
               projectName: $projectName,
               source: $source,
               triggeredBy: $triggeredBy,
-              results: [
-                { name: "Login in saucedemo", passed: $saucepassed, duration: $sauceduration, logUrl: $logUrl },
-                { name: "Login in expandtesting", passed: $expandpassed, duration: $expandduration, logUrl: $logUrl }
-              ]
+              results: $results
             }'
           )
 
           echo "Posting results:"
           echo "$PAYLOAD"
 
-          # send POST
           curl -X POST https://testhub-server.azurewebsites.net/api/testruns \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD"
