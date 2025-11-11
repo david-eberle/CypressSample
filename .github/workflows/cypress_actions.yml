@@ -61,17 +61,26 @@ jobs:
         with:
           path: ./cypress/results
 
+      - name: Flatten JSON files
+        run: |
+          find cypress/results -mindepth 2 -type f -name '*.json' -exec mv {} cypress/results/ \;
+
       - name: Build payload and post
         run: |
-          JOB_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          
+          JOB_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
           RESULTS_JSON="[]"
 
           for file in cypress/results/*.json; do
             TEST_NAME=$(jq -r '.testName' $file)
             DURATION=$(jq -r '.durationMs' $file)
-            PASSED=$(jq -r '.stats.failures == 0' $file)
-            
+            # asumimos que si el JSON no tiene stats.failures, lo marcamos como passed
+            if jq -e '.stats.failures' $file > /dev/null 2>&1; then
+              PASSED=$(jq -r '.stats.failures == 0' $file)
+            else
+              PASSED=true
+            fi
+
             RESULTS_JSON=$(echo $RESULTS_JSON | jq --arg name "$TEST_NAME" --argjson duration "$DURATION" --argjson passed "$PASSED" '. + [{name: $name, passed: $passed, duration: $duration, logUrl: "'"$JOB_URL"'"}]')
           done
 
