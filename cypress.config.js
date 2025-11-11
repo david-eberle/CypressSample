@@ -1,9 +1,17 @@
-const { defineConfig } = require("cypress");
+const { defineConfig } = require('cypress')
+const fs = require('fs')
+const path = require('path')
 
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
-      // implement node event listeners here
-    },
-  },
-});
+      on('task', {
+        writeFile({ filePath, content }) {
+          fs.mkdirSync(path.dirname(filePath), { recursive: true })
+          fs.writeFileSync(filePath, content)
+          return null
+        }
+      })
+    }
+  }
+})
