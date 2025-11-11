@@ -1,4 +1,4 @@
-name: Cypress Tests
+name: Cypress E2E Tests
 
 on:
   push:
@@ -13,35 +13,66 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Cypress
-        run: npx cypress install
-
-      - name: Run Cypress tests
-        id: cypress
-        run: npx cypress run --spec "cypress/e2e/saucedemo/**/*.cy.js"
-
-      - name: Read test results
+      - name: Run Cypress tests in Docker
         run: |
-          RESULTS_FILE="cypress/results/login-test.json"
-          if [ -f "$RESULTS_FILE" ]; then
-            TEST_NAME=$(jq -r '.testName' $RESULTS_FILE)
-            DURATION=$(jq -r '.durationMs' $RESULTS_FILE)
-            if [ "${{ job.status }}" == "success" ]; then
-              STATUS="passed"
-            else
-              STATUS="failed"
-            fi
-            echo "Test: $TEST_NAME"
-            echo "Duration (ms): $DURATION"
-            echo "Status: $STATUS"
+          docker run --rm \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run --spec "cypress/e2e/saucedemo/**/*.cy.js" || true
+
+          docker run --rm \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run --spec "cypress/e2e/expandtesting/**/*.cy.js" || true
+
+      - name: Post results to TestHub
+        env:
+          JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          # read JSONs
+          SAUCE_JSON="cypress/results/login-test.json"
+          EXPAND_JSON="cypress/results/expandtesting-login.json"
+
+          SAUCE_DURATION=$(jq -r '.durationMs' $SAUCE_JSON)
+          EXPAND_DURATION=$(jq -r '.durationMs' $EXPAND_JSON)
+
+          # determine pass/fail
+          if [ "$JOB_STATUS" == "success" ]; then
+            SAUCE_PASS=true
+            EXPAND_PASS=true
           else
-            echo "Results file not found"
+            SAUCE_PASS=false
+            EXPAND_PASS=false
           fi
+
+          # create payload
+          PAYLOAD=$(jq -n \
+            --arg projectName "Cypress Tests" \
+            --arg source "GitHub Actions" \
+            --arg triggeredBy "qat-ci-bot" \
+            --arg logUrl "$JOB_URL" \
+            --argjson sauceduration "$SAUCE_DURATION" \
+            --argjson expandduration "$EXPAND_DURATION" \
+            --argjson saucepassed "$SAUCE_PASS" \
+            --argjson expandpassed "$EXPAND_PASS" \
+            '{
+              projectName: $projectName,
+              source: $source,
+              triggeredBy: $triggeredBy,
+              results: [
+                { name: "Login in saucedemo", passed: $saucepassed, duration: $sauceduration, logUrl: $logUrl },
+                { name: "Login in expandtesting", passed: $expandpassed, duration: $expandduration, logUrl: $logUrl }
+              ]
+            }'
+          )
+
+          echo "Posting results:"
+          echo "$PAYLOAD"
+
+          # send POST
+          curl -X POST https://testhub-server.azurewebsites.net/api/testruns \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
