@@ -20,12 +20,12 @@ jobs:
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/saucedemo/**/*.cy.js" --reporter json --reporter-options output=cypress/results/saucedemo.json || true
+            npx cypress run --spec "cypress/e2e/saucedemo/login.cy.js" --reporter json --reporter-options output=cypress/results/saucedemo_login.json || true
 
       - name: Upload saucedemo result
         uses: actions/upload-artifact@v4
         with:
-          name: saucedemo-json
+          name: saucedemo_login-json
           path: cypress/results/saucedemo-login.json
 
   expandtesting_login:
@@ -43,18 +43,41 @@ jobs:
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/expandtesting/**/*.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting.json || true
+            npx cypress run --spec "cypress/e2e/expandtesting/login.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting_login.json || true
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
         with:
-          name: expandtesting-json
+          name: expandtesting_login-json
           path: cypress/results/expandtesting-login.json
+
+  expandtesting_webpark:
+    name: ExpandTesting Webpark
+    runs-on: ubuntu-latest
+    needs: [expandtesting_login]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress expandtesting tests
+        run: |
+          mkdir -p cypress/results
+          docker run --rm \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run --spec "cypress/e2e/expandtesting/webpark.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting_webpark.json || true
+
+      - name: Upload expandtesting result
+        uses: actions/upload-artifact@v4
+        with:
+          name: expandtesting_webpark-json
+          path: cypress/results/expandtesting-webpark.json
 
   notify_testhub:
     name: Post results to TestHub
     runs-on: ubuntu-latest
-    needs: [saucedemo_login, expandtesting_login]
+    needs: [saucedemo_login, expandtesting_login, expandtesting_webpark]
     env:
       TESTHUB_TOKEN: ${{ secrets.TESTHUB_TOKEN }}
     steps:
