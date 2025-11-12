@@ -14,10 +14,10 @@ describe('Login on SauceDemo', () => {
     })
 
     it('should save timestamps to JSON', function () {
-        const durationMs = endTime - startTime
+        const durationMs = (endTime - startTime) / 1000
 
         const allPassed = this.test.parent.tests
-            .filter(t => t.title !== this.test.title) // excluir este it
+            .filter(t => t.title !== this.test.title)
             .every(t => t.state === 'passed')
 
         const result = {
