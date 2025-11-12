@@ -1,5 +1,5 @@
 describe('Validate parking cost calculation', () => {
-    const resultsFile = 'cypress/results/expandtesting-login.json'
+    const resultsFile = 'cypress/results/expandtesting-webpark.json'
     let startTime, endTime
 
     it('should visit app and validate calculated cost', () => {
