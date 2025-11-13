@@ -14,10 +14,11 @@ describe('Validate parking cost calculation', () => {
 
         cy.get('#resultValue').should('have.text', '18.00€')
 
-        cy.then(() => { endTime = new Date() })
     })
 
     it('should save timestamps to JSON', function () {
+        endTime = new Date()
+
         const durationMs = (endTime - startTime) / 1000
 
         const allPassed = this.test.parent.tests
