@@ -10,10 +10,11 @@ describe('Login on SauceDemo', () => {
         cy.get('[data-test="login-button"]').click()
         cy.url().should('include', '/inventory.html')
         cy.get('.inventory_list').should('be.visible')
-        cy.then(() => { endTime = new Date() })
     })
 
     it('should save timestamps to JSON', function () {
+        endTime = new Date()
+
         const durationMs = (endTime - startTime) / 1000
 
         const allPassed = this.test.parent.tests
