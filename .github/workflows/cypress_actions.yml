@@ -9,7 +9,6 @@ jobs:
   expandtesting_login:
     name: ExpandTesting Login Test
     runs-on: ubuntu-latest
-    needs: [saucedemo_login]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
