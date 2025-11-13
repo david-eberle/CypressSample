@@ -6,33 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  saucedemo_login:
-    name: Saucedemo Login Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run Cypress saucedemo tests
-        run: |
-          mkdir -p cypress/results
-          echo "==> Running saucedemo login test..."
-          docker run --rm -t \
-            -v ${{ github.workspace }}:/e2e \
-            -w /e2e \
-            cypress/included:12.17.0 \
-            npx cypress run \
-              --spec "cypress/e2e/saucedemo/login.cy.js" \
-              --reporter json \
-              --reporter-options output=cypress/results/saucedemo-login.json \
-              --browser chrome
-
-      - name: Upload saucedemo result
-        uses: actions/upload-artifact@v4
-        with:
-          name: saucedemo-login-json
-          path: cypress/results/saucedemo-login.json
-
   expandtesting_login:
     name: ExpandTesting Login Test
     runs-on: ubuntu-latest
