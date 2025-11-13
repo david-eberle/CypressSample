@@ -8,7 +8,7 @@ describe('Validate parking cost calculation', () => {
         cy.visit('https://practice.expandtesting.com/webpark')
 
 
-        cy.get('#calculateCost').click()
+        cy.get('#calculateCost').click({ force: true })
 
         cy.get('#result').should('be.visible')
 

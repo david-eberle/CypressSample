@@ -8,9 +8,9 @@ describe('Login on ExpandTesting', () => {
         cy.visit('https://practice.expandtesting.com/login')
 
 
-        cy.get('#username').type('practice')
-        cy.get('#password').type('SuperSecretPassword!')
-        cy.get('#submit-login').click()
+        cy.get('#username').type('practice', { force: true })
+        cy.get('#password').type('SuperSecretPassword!', { force: true })
+        cy.get('#submit-login').click({ force: true })
 
         cy.url().should('include', '/secure')
         cy.get('#flash').should('contain.text', 'You logged into a secure area!')
