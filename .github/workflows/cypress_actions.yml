@@ -216,7 +216,7 @@ jobs:
             RESULTS_JSON=$(echo $RESULTS_JSON | jq --arg name "$TEST_NAME" --argjson duration "$DURATION" --argjson passed "$PASSED" '. + [{name: $name, passed: $passed, duration: $duration, logUrl: "'"$JOB_URL"'"}]')
           done
           PAYLOAD=$(jq -n \
-            --arg projectName "Cypress Tests" \
+            --arg projectName "ExpandTesting" \
             --arg source "GitHub Actions" \
             --arg triggeredBy "qat-ci-bot" \
             --argjson results "$RESULTS_JSON" \
