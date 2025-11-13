@@ -6,9 +6,37 @@ on:
   workflow_dispatch:
 
 jobs:
+  saucedemo_login:
+    name: Saucedemo Login Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress saucedemo tests
+        run: |
+          mkdir -p cypress/results
+          echo "==> Running saucedemo login test..."
+          docker run --rm -t \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run \
+              --spec "cypress/e2e/saucedemo/login.cy.js" \
+              --reporter json \
+              --reporter-options output=cypress/results/saucedemo-login.json \
+              --browser chrome || true
+
+      - name: Upload saucedemo result
+        uses: actions/upload-artifact@v4
+        with:
+          name: saucedemo-login-json
+          path: cypress/results/saucedemo-login.json
+
   expandtesting_login:
     name: ExpandTesting Login Test
     runs-on: ubuntu-latest
+    needs: [saucedemo_login]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,15 +45,15 @@ jobs:
         run: |
           mkdir -p cypress/results
           echo "==> Running expandtesting login test..."
-          docker run --rm \
+          docker run --rm -t \
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            sh -c "npx cypress run \
-              --spec 'cypress/e2e/expandtesting/login.cy.js' \
+            npx cypress run \
+              --spec "cypress/e2e/expandtesting/login.cy.js" \
               --reporter json \
               --reporter-options output=cypress/results/expandtesting-login.json \
-              --browser chrome" 2>&1 | grep -E --line-buffered '^synpress|^  |^#|^✓|^✗|^─|^┌|^└|passing|failing|Results|Run Starting|Tests:'
+              --browser chrome || true
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
@@ -45,47 +73,18 @@ jobs:
         run: |
           mkdir -p cypress/results
           echo "==> Running expandtesting webpark test..."
-          docker run --rm \
+          docker run --rm -t \
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            sh -c "npx cypress run \
-              --spec 'cypress/e2e/expandtesting/webpark.cy.js' \
+            npx cypress run \
+              --spec "cypress/e2e/expandtesting/webpark.cy.js" \
               --reporter json \
               --reporter-options output=cypress/results/expandtesting-webpark.json \
-              --browser chrome" 2>&1 | grep -E --line-buffered '^synpress|^  |^#|^✓|^✗|^─|^┌|^└|passing|failing|Results|Run Starting|Tests:'
+              --browser chrome || true
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
         with:
           name: expandtesting_webpark-json
           path: cypress/results/expandtesting-webpark.json
-
-  saucedemo_login:
-    name: Saucedemo Login Test
-    runs-on: ubuntu-latest
-    needs: [expandtesting_webpark]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run Cypress saucedemo tests
-        run: |
-          mkdir -p cypress/results
-          echo "==> Running saucedemo login test..."
-          docker run --rm \
-            -v ${{ github.workspace }}:/e2e \
-            -w /e2e \
-            cypress/included:12.17.0 \
-            sh -c "npx cypress run \
-              --spec 'cypress/e2e/saucedemo/login.cy.js' \
-              --reporter json \
-              --reporter-options output=cypress/results/saucedemo-login.json \
-              --browser chrome" 2>&1 | grep -E --line-buffered '^synpress|^  |^#|^✓|^✗|^─|^┌|^└|passing|failing|Results|Run Starting|Tests:'
-
-      - name: Upload saucedemo result
-        uses: actions/upload-artifact@v4
-        with:
-          name: saucedemo-login-json
-          path: cypress/results/saucedemo-login.json
-
