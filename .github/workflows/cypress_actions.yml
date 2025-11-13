@@ -20,12 +20,12 @@ jobs:
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/saucedemo/login.cy.js" --reporter json --reporter-options output=cypress/results/saucedemo_login.json || true
+            npx cypress run --spec "cypress/e2e/saucedemo/login.cy.js" --reporter json --reporter-options output=cypress/results/saucedemo-login.json || true
 
       - name: Upload saucedemo result
         uses: actions/upload-artifact@v4
         with:
-          name: saucedemo_login-json
+          name: saucedemo-login-json
           path: cypress/results/saucedemo-login.json
 
   expandtesting_login:
@@ -43,12 +43,12 @@ jobs:
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/expandtesting/login.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting_login.json || true
+            npx cypress run --spec "cypress/e2e/expandtesting/login.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting-login.json || true
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
         with:
-          name: expandtesting_login-json
+          name: expandtesting-login-json
           path: cypress/results/expandtesting-login.json
 
   expandtesting_webpark:
@@ -66,7 +66,7 @@ jobs:
             -v ${{ github.workspace }}:/e2e \
             -w /e2e \
             cypress/included:12.17.0 \
-            npx cypress run --spec "cypress/e2e/expandtesting/webpark.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting_webpark.json || true
+            npx cypress run --spec "cypress/e2e/expandtesting/webpark.cy.js" --reporter json --reporter-options output=cypress/results/expandtesting-webpark.json || true
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
