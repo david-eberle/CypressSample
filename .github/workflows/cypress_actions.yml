@@ -1,9 +1,9 @@
 name: Cypress E2E Tests
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 13 * * *'
 
 jobs:
   saucedemo_login:
