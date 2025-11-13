@@ -24,7 +24,7 @@ jobs:
             -w /e2e \
             cypress/included:12.17.0 \
             npx cypress run \
-              --spec "cypress/e2e/expandtesting/login.cy.js" \
+              --spec "cypress/e2e/saucedemo/login.cy.js" \
               --reporter json \
               --reporter-options output=cypress/results/saucedemo-login.json \
               --browser chrome
