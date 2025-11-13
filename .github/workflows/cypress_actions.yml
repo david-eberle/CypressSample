@@ -25,7 +25,7 @@ jobs:
               --spec "cypress/e2e/saucedemo/login.cy.js" \
               --reporter json \
               --reporter-options output=cypress/results/saucedemo-login.json \
-              --browser chrome || true
+              --browser chrome
 
       - name: Upload saucedemo result
         uses: actions/upload-artifact@v4
@@ -53,7 +53,7 @@ jobs:
               --spec "cypress/e2e/expandtesting/login.cy.js" \
               --reporter json \
               --reporter-options output=cypress/results/expandtesting-login.json \
-              --browser chrome || true
+              --browser chrome
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
@@ -81,7 +81,7 @@ jobs:
               --spec "cypress/e2e/expandtesting/webpark.cy.js" \
               --reporter json \
               --reporter-options output=cypress/results/expandtesting-webpark.json \
-              --browser chrome || true
+              --browser chrome
 
       - name: Upload expandtesting result
         uses: actions/upload-artifact@v4
