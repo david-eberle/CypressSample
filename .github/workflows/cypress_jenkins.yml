@@ -131,7 +131,7 @@ jobs:
           done
           PAYLOAD=$(jq -n \
             --arg projectName "ExpandTesting" \
-            --arg source "GitHub Actions" \
+            --arg source "Jenkins" \
             --arg triggeredBy "qat-ci-bot" \
             --argjson results "$RESULTS_JSON" \
             '{
