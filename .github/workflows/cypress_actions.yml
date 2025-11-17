@@ -185,10 +185,146 @@ jobs:
           name: expandtesting-upload-json
           path: cypress/results/expandtesting-upload.json
 
+
+  ####################################################
+  # NUEVOS TESTS
+  ####################################################
+
+  expandtesting_dynamicpagination:
+    name: ExpandTesting Dynamic Pagination
+    runs-on: ubuntu-latest
+    needs: [expandtesting_upload]
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress pagination test
+        run: |
+          mkdir -p cypress/results
+          echo "==> Running expandtesting dynamic pagination..."
+          docker run --rm -t \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run \
+              --spec "cypress/e2e/expandtesting/dynamicpagination.cy.js" \
+              --reporter json \
+              --reporter-options output=cypress/results/expandtesting-dynamicpagination.json \
+              --browser chrome
+
+      - name: Upload pagination result
+        uses: actions/upload-artifact@v4
+        with:
+          name: expandtesting-dynamicpagination-json
+          path: cypress/results/expandtesting-dynamicpagination.json
+
+
+  expandtesting_notification:
+    name: ExpandTesting Notification
+    runs-on: ubuntu-latest
+    needs: [expandtesting_dynamicpagination]
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress notification test
+        run: |
+          mkdir -p cypress/results
+          echo "==> Running expandtesting notification..."
+          docker run --rm -t \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run \
+              --spec "cypress/e2e/expandtesting/notification.cy.js" \
+              --reporter json \
+              --reporter-options output=cypress/results/expandtesting-notification.json \
+              --browser chrome
+
+      - name: Upload notification result
+        uses: actions/upload-artifact@v4
+        with:
+          name: expandtesting-notification-json
+          path: cypress/results/expandtesting-notification.json
+
+
+  expandtesting_formvalidation:
+    name: ExpandTesting Form Validation
+    runs-on: ubuntu-latest
+    needs: [expandtesting_notification]
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress form validation test
+        run: |
+          mkdir -p cypress/results
+          echo "==> Running expandtesting form validation..."
+          docker run --rm -t \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run \
+              --spec "cypress/e2e/expandtesting/formvalidation.cy.js" \
+              --reporter json \
+              --reporter-options output=cypress/results/expandtesting-formvalidation.json \
+              --browser chrome
+
+      - name: Upload form validation result
+        uses: actions/upload-artifact@v4
+        with:
+          name: expandtesting-formvalidation-json
+          path: cypress/results/expandtesting-formvalidation.json
+
+
+  expandtesting_autocomplete:
+    name: ExpandTesting Autocomplete
+    runs-on: ubuntu-latest
+    needs: [expandtesting_formvalidation]
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Cypress autocomplete test
+        run: |
+          mkdir -p cypress/results
+          echo "==> Running expandtesting autocomplete..."
+          docker run --rm -t \
+            -v ${{ github.workspace }}:/e2e \
+            -w /e2e \
+            cypress/included:12.17.0 \
+            npx cypress run \
+              --spec "cypress/e2e/expandtesting/autocomplete.cy.js" \
+              --reporter json \
+              --reporter-options output=cypress/results/expandtesting-autocomplete.json \
+              --browser chrome
+
+      - name: Upload autocomplete result
+        uses: actions/upload-artifact@v4
+        with:
+          name: expandtesting-autocomplete-json
+          path: cypress/results/expandtesting-autocomplete.json
+
+
   notify_testhub:
     name: Post results to TestHub
     runs-on: ubuntu-latest
-    needs: [saucedemo_login, expandtesting_login, expandtesting_webpark, expandtesting_draganddrop, expandtesting_typo, expandtesting_upload]
+    needs: [
+      saucedemo_login,
+      expandtesting_login,
+      expandtesting_webpark,
+      expandtesting_draganddrop,
+      expandtesting_typo,
+      expandtesting_upload,
+      expandtesting_dynamicpagination,
+      expandtesting_notification,
+      expandtesting_formvalidation,
+      expandtesting_autocomplete
+    ]
     env:
       TESTHUB_TOKEN: ${{ secrets.TESTHUB_TOKEN }}
     steps:
