@@ -16,6 +16,16 @@ describe('Drag and Drop on ExpandTesting', () => {
         cy.get('#dnd-columns .column').first().find('header').should('contain.text', 'B')
     })
 
+    it('should fail randomly for TestHub dashboard testing', () => {
+        const random = Math.random()
+        const FAIL_PROBABILITY = 0.02
+        if (random < FAIL_PROBABILITY) {
+            throw new Error('Intentional failure for dashboard testing')
+        }
+
+        expect(true).to.equal(true)
+    })
+
     it('should save timestamps to JSON', function () {
         endTime = new Date()
 

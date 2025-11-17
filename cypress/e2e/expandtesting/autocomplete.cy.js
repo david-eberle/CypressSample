@@ -21,6 +21,16 @@ describe('Autocomplete on ExpandTesting', () => {
         cy.get('#country').should('have.value', 'Argentina')
     })
 
+    it('should fail randomly for TestHub dashboard testing', () => {
+        const random = Math.random()
+        const FAIL_PROBABILITY = 0.05
+        if (random < FAIL_PROBABILITY) {
+            throw new Error('Intentional failure for dashboard testing')
+        }
+
+        expect(true).to.equal(true)
+    })
+
     it('should save timestamps to JSON', function () {
         endTime = new Date()
 

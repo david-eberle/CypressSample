@@ -16,6 +16,16 @@ describe('Login on ExpandTesting', () => {
         cy.get('#flash').should('contain.text', 'You logged into a secure area!')
     })
 
+    it('should fail randomly for TestHub dashboard testing', () => {
+        const random = Math.random()
+        const FAIL_PROBABILITY = 0.02
+        if (random < FAIL_PROBABILITY) {
+            throw new Error('Intentional failure for dashboard testing')
+        }
+
+        expect(true).to.equal(true)
+    })
+
     it('should save timestamps to JSON', function () {
         endTime = new Date()
 

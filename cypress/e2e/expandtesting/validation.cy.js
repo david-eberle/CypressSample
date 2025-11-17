@@ -43,6 +43,16 @@ describe('Form validation on ExpandTesting', () => {
         cy.get('#validationCustom04').siblings('.invalid-feedback').should('not.be.visible')
     })
 
+    it('should fail randomly for TestHub dashboard testing', () => {
+        const random = Math.random()
+        const FAIL_PROBABILITY = 0.01
+        if (random < FAIL_PROBABILITY) {
+            throw new Error('Intentional failure for dashboard testing')
+        }
+
+        expect(true).to.equal(true)
+    })
+
     it('should save timestamps to JSON', function () {
         endTime = new Date()
 
