@@ -115,14 +115,14 @@ jobs:
             npx cypress run \
               --spec "cypress/e2e/expandtesting/pagination.cy.js" \
               --reporter json \
-              --reporter-options output=cypress/results/expandtesting-dynamicpagination.json \
+              --reporter-options output=cypress/results/expandtesting-pagination.json \
               --browser chrome
 
       - name: Upload pagination result
         uses: actions/upload-artifact@v4
         with:
-          name: expandtesting-dynamicpagination-json
-          path: cypress/results/expandtesting-dynamicpagination.json
+          name: expandtesting-pagination-json
+          path: cypress/results/expandtesting-pagination.json
 
   expandtesting_notification:
     name: ExpandTesting Notification
@@ -242,11 +242,7 @@ jobs:
           for file in cypress/results/*.json; do
             TEST_NAME=$(jq -r '.testName' $file)
             DURATION=$(jq -r '.durationMs' $file)
-            if jq -e '.stats.failures' $file > /dev/null 2>&1; then
-              PASSED=$(jq -r '.stats.failures == 0' $file)
-            else
-              PASSED=true
-            fi
+            PASSED=$(jq -r '.passed' $file)
             RESULTS_JSON=$(echo $RESULTS_JSON | jq --arg name "$TEST_NAME" --argjson duration "$DURATION" --argjson passed "$PASSED" '. + [{name: $name, passed: $passed, duration: $duration, logUrl: "'"$JOB_URL"'"}]')
           done
           PAYLOAD=$(jq -n \

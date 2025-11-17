@@ -18,7 +18,7 @@ describe('Login on ExpandTesting', () => {
 
     it('should fail randomly for TestHub dashboard testing', () => {
         const random = Math.random()
-        const FAIL_PROBABILITY = 0.02
+        const FAIL_PROBABILITY = 1 //0.02
         if (random < FAIL_PROBABILITY) {
             throw new Error('Intentional failure for dashboard testing')
         }
