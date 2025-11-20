@@ -1,9 +1,10 @@
 describe('Login on ExpandTesting', () => {
     const resultsFile = 'cypress/results/expandtesting-login.json'
-    let startTime, endTime
+    let testCtx = null
 
-    it('should login with valid credentials and validate login', () => {
-        startTime = new Date()
+    it('should login with valid credentials and validate login', function () {
+        cy.startTimer()
+
 
         cy.visit('https://practice.expandtesting.com/login')
 
@@ -14,38 +15,18 @@ describe('Login on ExpandTesting', () => {
 
         cy.url().should('include', '/secure')
         cy.get('#flash').should('contain.text', 'You logged into a secure area!')
+        cy.then(() => { testCtx = this })
+
     })
 
     it('should fail randomly for TestHub dashboard testing', () => {
-        const random = Math.random()
         const FAIL_PROBABILITY = 0.02
-        if (random < FAIL_PROBABILITY) {
-            throw new Error('Intentional failure for dashboard testing')
-        }
-
-        expect(true).to.equal(true)
+        cy.maybeFailForDashboard(FAIL_PROBABILITY)
     })
 
-    it('should save timestamps to JSON', function () {
-        endTime = new Date()
-
-        const durationMs = (endTime - startTime) / 1000
-
-        const allPassed = this.test.parent.tests
-            .filter(t => t.title !== this.test.title)
-            .every(t => t.state === 'passed')
-
-        const result = {
-            testName: 'Login on ExpandTesting',
-            startTime: startTime.toISOString(),
-            endTime: endTime.toISOString(),
-            durationMs,
-            passed: allPassed
-        }
-
-        cy.task('writeFile', {
-            filePath: resultsFile,
-            content: JSON.stringify(result, null, 2)
+    it('should save timestamps to JSON', () => {
+        cy.then(() => {
+            cy.saveResults(resultsFile, 'Login on ExpandTesting', testCtx)
         })
     })
 })

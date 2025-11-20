@@ -1,9 +1,9 @@
 describe('Form validation on ExpandTesting', () => {
     const resultsFile = 'cypress/results/expandtesting-formvalidation.json'
-    let startTime, endTime
+    let testCtx = null
 
-    it('should validate all fields', () => {
-        startTime = new Date()
+    it('should validate all fields', function () {
+        cy.startTimer()
 
         cy.visit('https://practice.expandtesting.com/form-validation')
 
@@ -41,38 +41,20 @@ describe('Form validation on ExpandTesting', () => {
         cy.get('#validationCustom04').select('card')
         cy.wait(500)
         cy.get('#validationCustom04').siblings('.invalid-feedback').should('not.be.visible')
+
+        cy.then(() => { testCtx = this })
+
     })
 
     it('should fail randomly for TestHub dashboard testing', () => {
-        const random = Math.random()
         const FAIL_PROBABILITY = 0.01
-        if (random < FAIL_PROBABILITY) {
-            throw new Error('Intentional failure for dashboard testing')
-        }
-
-        expect(true).to.equal(true)
+        cy.maybeFailForDashboard(FAIL_PROBABILITY)
     })
 
-    it('should save timestamps to JSON', function () {
-        endTime = new Date()
-
-        const durationMs = (endTime - startTime) / 1000
-
-        const allPassed = this.test.parent.tests
-            .filter(t => t.title !== this.test.title)
-            .every(t => t.state === 'passed')
-
-        const result = {
-            testName: 'Form validation on ExpandTesting',
-            startTime: startTime.toISOString(),
-            endTime: endTime.toISOString(),
-            durationMs,
-            passed: allPassed
-        }
-
-        cy.task('writeFile', {
-            filePath: resultsFile,
-            content: JSON.stringify(result, null, 2)
+    it('should write timestamps to JSON file', () => {
+        cy.then(() => {
+            cy.saveResults(resultsFile, 'Form validation on ExpandTesting', testCtx)
         })
+
     })
 })
