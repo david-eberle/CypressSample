@@ -246,8 +246,9 @@ jobs:
           for file in cypress/results/*.json; do
             TEST_NAME=$(jq -r '.testName' $file)
             DURATION=$(jq -r '.durationMs' $file)
+            ERROR_MSG=$(jq -r '.firstErrorMessage' $file)
             PASSED=$(jq -r '.passed' $file)
-            RESULTS_JSON=$(echo $RESULTS_JSON | jq --arg name "$TEST_NAME" --argjson duration "$DURATION" --argjson passed "$PASSED" '. + [{name: $name, passed: $passed, duration: $duration, logUrl: "'"$JOB_URL"'"}]')
+            RESULTS_JSON=$(echo $RESULTS_JSON | jq --arg name "$TEST_NAME" --argjson duration "$DURATION" --argjson passed "$PASSED"  --argjson errormsg "$ERROR_MSG" '. + [{name: $name, passed: $passed, duration: $duration, errormsg: $errormsg, logUrl: "'"$JOB_URL"'"}]')
           done
           PAYLOAD=$(jq -n \
             --arg projectName "ExpandTesting" \
