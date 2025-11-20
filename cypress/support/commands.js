@@ -15,7 +15,7 @@ Cypress.Commands.add('saveResults', (resultsFile, testName, testCtx) => {
     const suite = testCtx.test.parent
     const tests = suite.tests
 
-    const durationMs = endTime - startTime
+    const durationMs = (endTime - startTime) / 1000
 
     const failedTest = tests.find(t => t.state === 'failed')
     const firstErrorMessage = failedTest?.err?.message || null
