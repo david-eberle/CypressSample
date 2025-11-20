@@ -5,6 +5,7 @@ describe('Upload file on ExpandTesting', () => {
 
     it('should upload a file and verify', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.on('uncaught:exception', () => false)
 
@@ -15,7 +16,6 @@ describe('Upload file on ExpandTesting', () => {
         cy.get('h1').should('contain.text', 'File Uploaded!')
         cy.get('#uploaded-files p').should('contain.text', 'upload.txt')
 
-        cy.then(() => { testCtx = this })
     })
 
     it('should fail randomly for dashboard testing', () => {

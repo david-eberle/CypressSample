@@ -4,6 +4,7 @@ describe('Notification message on ExpandTesting', () => {
 
     it('should show Action successful message after clicking', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/notification-message-rendered')
 
@@ -12,8 +13,6 @@ describe('Notification message on ExpandTesting', () => {
         cy.contains('a', 'Click here').click()
 
         cy.get('#flash b').should('be.visible')
-
-        cy.then(() => { testCtx = this })
 
     })
 

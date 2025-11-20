@@ -4,7 +4,7 @@ describe('Drag and Drop on ExpandTesting', () => {
 
     it('should drag A over B and verify B is first', function () {
         cy.startTimer()
-
+        cy.then(() => { testCtx = this })
         cy.visit('https://practice.expandtesting.com/drag-and-drop')
 
         const dataTransfer = new DataTransfer()
@@ -14,7 +14,6 @@ describe('Drag and Drop on ExpandTesting', () => {
         cy.get('#column-a').trigger('dragend')
 
         cy.get('#dnd-columns .column').first().find('header').should('contain.text', 'B')
-        cy.then(() => { testCtx = this })
 
     })
 

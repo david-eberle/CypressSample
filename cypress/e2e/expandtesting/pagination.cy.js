@@ -4,6 +4,7 @@ describe('Pagination change on ExpandTesting', () => {
 
     it('should change items per page from 3 to 5 and verify table updates', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/dynamic-pagination-table')
 
@@ -12,7 +13,6 @@ describe('Pagination change on ExpandTesting', () => {
         cy.get('#example tbody tr')
             .should('have.length', 5)
 
-        cy.then(() => { testCtx = this })
 
     })
 

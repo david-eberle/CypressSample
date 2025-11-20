@@ -4,13 +4,13 @@ describe('Validate parking cost calculation', () => {
 
     it('should visit app and validate calculated cost', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/webpark')
 
         cy.get('#calculateCost').click({ force: true })
         cy.get('#result').should('be.visible')
         cy.get('#resultValue').should('have.text', '18.00€')
-        cy.then(() => { testCtx = this })
 
     })
 

@@ -4,7 +4,7 @@ describe('Login on ExpandTesting', () => {
 
     it('should login with valid credentials and validate login', function () {
         cy.startTimer()
-
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/login')
 
@@ -15,7 +15,6 @@ describe('Login on ExpandTesting', () => {
 
         cy.url().should('include', '/secure')
         cy.get('#flash').should('contain.text', 'You logged into a secure area!')
-        cy.then(() => { testCtx = this })
 
     })
 

@@ -4,6 +4,7 @@ describe('Autocomplete on ExpandTesting', () => {
 
     it('should autocomplete country name', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/autocomplete')
 
@@ -19,7 +20,6 @@ describe('Autocomplete on ExpandTesting', () => {
             .click()
 
         cy.get('#country').should('have.value', 'Argentina')
-        cy.then(() => { testCtx = this })
 
     })
 

@@ -4,6 +4,7 @@ describe('Form validation on ExpandTesting', () => {
 
     it('should validate all fields', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/form-validation')
 
@@ -41,8 +42,6 @@ describe('Form validation on ExpandTesting', () => {
         cy.get('#validationCustom04').select('card')
         cy.wait(500)
         cy.get('#validationCustom04').siblings('.invalid-feedback').should('not.be.visible')
-
-        cy.then(() => { testCtx = this })
 
     })
 

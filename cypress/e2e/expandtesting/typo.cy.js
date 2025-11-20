@@ -4,12 +4,12 @@ describe('Typo on ExpandTesting', () => {
 
     it('should check for typo text', function () {
         cy.startTimer()
+        cy.then(() => { testCtx = this })
 
         cy.visit('https://practice.expandtesting.com/typos')
 
         cy.contains("Sometimes you'll see a typo, other times you won't.")
             .should('exist')
-        cy.then(() => { testCtx = this })
 
     })
 
